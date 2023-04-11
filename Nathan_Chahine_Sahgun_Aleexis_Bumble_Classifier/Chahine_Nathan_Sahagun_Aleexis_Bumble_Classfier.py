@@ -4,28 +4,24 @@ import nltk
 from nltk import word_tokenize
 from nltk.stem import PorterStemmer
 import pandas as pd
-import sys
 
-
+# downloading needed nltk packages
 nltk.download("stopwords")
 # Getting the stop words corpus
 stopwords_corpus = nltk.corpus.stopwords.words('english')
 ps = PorterStemmer()
-
 # Reading csv file
 bumble = pd.read_csv("bumble_google_play_reviews - bumble_google_play_reviews copy.csv")
 
 # Getting rid of nan values in the content section of csv file
 bumble = bumble[bumble['content'].notna()]
 
-# boolean to determine whether we skip lowercase or not
-if len(sys.argv) != 2:
-    ignore = False
+# determining whether we skip lowercase or not
+skip = input("Do you want to skip Lower-Casing step?")
+if skip == "Yes" or skip == "yes" or skip == "YES" or skip == "y" or skip == "Y":
+    ignore = True
 else:
-    if sys.argv[1] == "YES" or sys.argv[1] == "Yes" or sys.argv[1] == "yes":
-        ignore = True
-    else:
-        ignore = False
+    ignore = False
 
 
 def classifier(ignore):
@@ -35,7 +31,6 @@ def classifier(ignore):
     # Initializing dictionary's
     training_samples = {}
     test_samples = {}
-    print("Sahagun, Aleexis, A20463674, Chahine, Nathan, A20441932 solution:")
     if ignore:
         print("Ignored pre-processing step: LOWER CASING")
     else:
@@ -56,7 +51,7 @@ def classifier(ignore):
             content1 = word_tokenize(content)
             # Removing stop words from the tokenized review
             content = [w for w in content1 if w not in stopwords_corpus]
-            # Stemming remaining words and adding them to a list
+            # Lemmatizing remaining words and adding them to a list
             content2 = [ps.stem(w, to_lowercase=False) for w in content]
             if count < training_bounds:
                 # Adding the tokenized sentence and respective score to training dictionary with count as the key
@@ -343,15 +338,16 @@ def classifier(ignore):
         predicted_label1 = [prob_of_sen_w_label1, prob_of_sen_w_label2, prob_of_sen_w_label3,
                             prob_of_sen_w_label4, prob_of_sen_w_label5]
         predicted_label = predicted_label1.index(max(predicted_label1))
-        if predicted_label == 0:
-            print("Classification/Rating: " + "⭐ ")
+        predicted_label += 1
         if predicted_label == 1:
-            print("Classification/Rating: " + "⭐ ⭐ ")
+            print("Classification/Rating: " + "⭐ ")
         if predicted_label == 2:
-            print("Classification/Rating: " + "⭐ ⭐ ⭐ ")
+            print("Classification/Rating: " + "⭐ ⭐ ")
         if predicted_label == 3:
-            print("Classification/Rating: " + "⭐ ⭐ ⭐ ⭐ ")
+            print("Classification/Rating: " + "⭐ ⭐ ⭐ ")
         if predicted_label == 4:
+            print("Classification/Rating: " + "⭐ ⭐ ⭐ ⭐ ")
+        if predicted_label == 5:
             print("Classification/Rating: " + "⭐ ⭐ ⭐ ⭐ ⭐ ")
         # printing the probabilities of the sentence for each label
         print("P(1 star | " + sentence + "): " + str(prob_of_sen_w_label1))
@@ -359,7 +355,30 @@ def classifier(ignore):
         print("P(3 stars | " + sentence + "): " + str(prob_of_sen_w_label3))
         print("P(4 stars | " + sentence + "): " + str(prob_of_sen_w_label4))
         print("P(5 stars | " + sentence + "): " + str(prob_of_sen_w_label5))
-        answer = input("Do you want to enter another sentence [Y/N]? ")
+        check_score = input("Was this the expected score? [Y/N] ")
+        if check_score == "no" or check_score == "NO" or check_score == "N" or check_score == "n" or check_score == "No":
+            predicted_label = input("Enter a score: [1-5] ")
+            error = True
+            while error:
+                try:
+                    predicted_label = int(predicted_label)
+                    if 1 <= predicted_label < 6:
+                        error = False
+                except:
+                    print("Sorry incorrect input please try again!")
+                    predicted_label = input("Enter a score: [1-5]")
+                    error = True
+        with open('bumble_google_play_reviews copy.csv', 'a') as f_object:
+            field_names = ['reviewId', 'userName', 'userImage', 'content', 'score', 'thumbsUpCount',
+                           'reviewCreatedVersion', 'at', 'replyContent', 'repliedAt']
+            append_dict = {"reviewId": "", "userName": "", "userImage": "", "content": sentence,
+                           "score": predicted_label,
+                           "thumbsUpCount": "", "reviewCreatedVersion": "", "at": "", "replyContent": "",
+                           "repliedAt": ""}
+            dict_object = csv.DictWriter(f_object, fieldnames=field_names)
+            dict_object.writerow(append_dict)
+            f_object.close()
+        answer = input(" Do you want to enter another sentence? [Y/N]? ")
 
 
 classifier(ignore)
