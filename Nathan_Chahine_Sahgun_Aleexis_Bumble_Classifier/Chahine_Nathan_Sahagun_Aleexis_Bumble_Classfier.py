@@ -51,7 +51,7 @@ def classifier(ignore):
             content1 = word_tokenize(content)
             # Removing stop words from the tokenized review
             content = [w for w in content1 if w not in stopwords_corpus]
-            # Lemmatizing remaining words and adding them to a list
+            # stemming remaining words and adding them to a list
             content2 = [ps.stem(w, to_lowercase=False) for w in content]
             if count < training_bounds:
                 # Adding the tokenized sentence and respective score to training dictionary with count as the key
