@@ -5,7 +5,7 @@ from nltk import word_tokenize
 from nltk.stem import PorterStemmer
 import pandas as pd
 
-# downloading needed nltk packages
+# downloading the needed nltk packages
 nltk.download("stopwords")
 # Getting the stop words corpus
 stopwords_corpus = nltk.corpus.stopwords.words('english')
