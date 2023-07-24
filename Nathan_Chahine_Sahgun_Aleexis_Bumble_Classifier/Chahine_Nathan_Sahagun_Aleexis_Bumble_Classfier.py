@@ -76,7 +76,7 @@ def classifier(ignore):
     end = time.time()
     total_time = end - start
     print("Pre-processing completed in: " + str(total_time))
-    #
+    
     word_counts1 = {}
     word_counts2 = {}
     word_counts3 = {}
